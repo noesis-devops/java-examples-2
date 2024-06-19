@@ -1,0 +1,35 @@
+stages:
+- build
+- code
+- test
+
+#build:
+#  stage: build
+#  image: maven:latest
+#  script:
+#    - mvn clean install
+
+variables:
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+
+gemnasium-dependency_scanning:
+  variables:
+    DS_MAX_DEPTH: '-1'
+
+include:
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - component: gitlab.com/components/code-quality/code-quality@main
+  - component: gitlab.com/components/sast/sast@main
+  - component: gitlab.com/components/secret-detection/secret-detection@main
+
+code_quality_html:
+  extends: code_quality
+  variables:
+    REPORT_FORMAT: html
+  artifacts:
+    paths: [gl-code-quality-report.html]
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'
