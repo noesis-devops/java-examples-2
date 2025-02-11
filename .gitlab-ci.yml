@@ -33,3 +33,5 @@ code_quality_html:
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web"'
+
+#more...
